@@ -1,5 +1,14 @@
 const inquirerMod = require("inquirer");
-const db = require("db");
+const mysql = require('mysql2');
+
+const db = mysql.createConnection (
+  {
+    host: `localhost`,
+    user: `root`,
+    password: `supersecretpassword`,
+    database: `employees_db`
+  }, console.log(`Connected to the employees_db database.`)
+);
 
 const mainQuestion = 
   {
@@ -24,6 +33,6 @@ function generateQuestions () {
   })
 }
 
-generateQuestions();
+generateQuestions(db);
 
 module.exports = generateQuestions;
