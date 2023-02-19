@@ -1,0 +1,3 @@
+class ViewTables {
+  constructor()
+}
