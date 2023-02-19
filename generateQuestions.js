@@ -1,5 +1,6 @@
 const inquirerMod = require("inquirer");
 const mysql = require('mysql2');
+const table = require("console.table");
 
 const db = mysql.createConnection (
   {
@@ -26,7 +27,8 @@ function generateQuestions () {
     switch (data.action) {
       case "View all departments":
         db.query(`SELECT * FROM departments`, function (err, results) {
-          console.log(results);
+          console.log("\n");
+          console.table(results);
         });
         break;
     }
