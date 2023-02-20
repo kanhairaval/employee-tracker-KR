@@ -2,14 +2,14 @@ SELECT
   employees.employee_id AS id, 
   employees.first_name, 
   employees.last_name, 
-  roles.job_title AS title, 
-  departments.department_name AS department, 
+  roles.job_title, 
+  departments.department_name, 
   roles.role_salary AS salary, 
-  CONCAT(first_name, ' ', last_name) AS manager 
+  CONCAT(managers.first_name, ' ', managers.last_name) AS reporting_manager 
 FROM 
-  employees
-  GROUP BY 
-  first_name,last_name
-  LEFT JOIN employees ON employees.manager_id = employees.employee_id
-  JOIN roles ON employees.id_role = roles.role_id
-  JOIN departments ON roles.dep_id = departments.id;
+  employees 
+  JOIN roles ON employees.id_role = roles.role_id 
+  JOIN departments ON roles.dep_id = departments.id 
+  LEFT JOIN employees AS managers ON employees.manager_id = managers.employee_id 
+GROUP BY 
+  employees.employee_id;
