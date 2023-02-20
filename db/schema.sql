@@ -13,11 +13,10 @@ CREATE TABLE departments (
 CREATE TABLE roles (
   role_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
   job_title VARCHAR(60) NOT NULL,
+  dep_id INT NOT NULL,
   role_salary DECIMAL NOT NULL,
-  dep_id INT,
   FOREIGN KEY (dep_id)
   REFERENCES departments(id)
-  ON DELETE SET NULL
 );
 
 CREATE TABLE employees (
@@ -27,9 +26,7 @@ CREATE TABLE employees (
   manager_id INT,
   id_role INT,
   FOREIGN KEY (id_role)
-  REFERENCES roles(role_id)
-  ON DELETE SET NULL,
+  REFERENCES roles(role_id),
   FOREIGN KEY (manager_id)
   REFERENCES employees(employee_id)
-  ON DELETE SET NULL
 );
