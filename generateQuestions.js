@@ -36,7 +36,7 @@ const roleQuestions =
     type: "list",
     name: "depList",
     message: "What department does this role belong to?",
-    choices: function () {
+    choices: [function () {
       return new Promise(function(resolve, reject) {
         db.query(`SELECT * FROM departments`,
         function (err,results) {
@@ -44,7 +44,7 @@ const roleQuestions =
           console.table(results);
         })
       })
-    }
+    }]
   }]
 
 // const secondRoleQuestion =
