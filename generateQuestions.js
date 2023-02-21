@@ -27,11 +27,25 @@ const departmentQuestion =
   }
 
 const roleQuestions =
-  {
+  [{
     type: "input",
     name: "role",
     message: "What is the name of the role you would like to add?"
-  }
+  },
+  {
+    type: "list",
+    name: "depList",
+    message: "What department does this role belong to?",
+    choices: function () {
+      return new Promise(function(resolve, reject) {
+        db.query(`SELECT * FROM departments`,
+        function (err,results) {
+          console.log("\n");
+          console.table(results);
+        })
+      })
+    }
+  }]
 
 // const secondRoleQuestion =
 //   {
@@ -108,6 +122,7 @@ function generateQuestions () {
             console.log("\n");
             console.table(`${data.role} role has been added to the roles table.`);
           })
+
           });
           break;
     }
