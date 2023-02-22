@@ -16,7 +16,7 @@ const mainQuestion =
     type: "list",
     name: "action",
     message: "What would you like to do?",
-    choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update an employee role", "Exit"]
+    choices: ["View all departments", "View all roles", "View all employees", "Add a department", "Add a role", "Add an employee", "Update an employee role", "Delete a department", "Delete a role", "Delete an employee", "Exit"]
   };
 
 const departmentQuestion =
@@ -115,7 +115,20 @@ const employeeQuestions =
         });
       });
     }
-   }]
+   },
+   {
+    type: "list",
+    name: "newManager",
+    message: "Who is the employee's new manager?",
+    choices: function() {
+      return new Promise(function(resolve, reject) {
+        db.query(`SELECT manager_id, employee_id, first_name, last_name FROM employees`, function(err, results) {
+          if (err) reject(err);
+          resolve(results.map(result => ({name: result.manager_id ? `${result.first_name} ${result.last_name}` : "None", value: result.employee_id})));
+        });
+      });
+    }
+  }]
 
 function generateQuestions () {
   inquirerMod.prompt(mainQuestion, departmentQuestion)
@@ -125,6 +138,7 @@ function generateQuestions () {
         db.query(`SELECT * FROM departments`, function (err, results) {
           console.log("\n");
           console.table(results);
+          generateQuestions();
         });
         break;
       case "View all roles":
@@ -138,6 +152,7 @@ function generateQuestions () {
         function (err, results) {
         console.log("\n");
         console.table(results);
+        generateQuestions();
       });
         break
       case "View all employees":
@@ -159,6 +174,7 @@ function generateQuestions () {
         function (err, results) {
         console.log("\n");
         console.table(results);
+        generateQuestions();
       });
         break
       case "Add a department":
@@ -169,6 +185,7 @@ function generateQuestions () {
           function (err, results) {
             console.log("\n");
             console.table(`${data.department} department has been added to the departments table.`);
+            generateQuestions();
           })
         });
          break;
@@ -180,6 +197,7 @@ function generateQuestions () {
           function (err, results) {
             console.log("\n");
             console.table(`${data.role} role has been added to the roles table.`);
+            generateQuestions();
           })
           });
           break;
@@ -192,22 +210,21 @@ function generateQuestions () {
           function (err, results) {
             console.log("\n");
             console.table(`${data.firstName} ${data.lastName} ${data.role} ${data.repManager} has been added to the employees table.`);
+            generateQuestions();
           })
           });
           break;
           case "Update an employee role":
             inquirerMod.prompt(updateEmployee)
             .then(function (data) {
-              console.log(data.roleType)
-              console.log(data.newRole)
-            db.query(`UPDATE employees
-            SET id_role = ?
-            WHERE employee_id = ?`),
-            [data.roleType, data.newRole],
+              console.log(data.newManager);
+            db.query(`UPDATE employees SET id_role = ?, manager_id = ? WHERE employee_id = ?`,
+            [data.roleType, data.newManager, data.newRole],
             function (err, results) {
               console.log("\n");
-              console.table(`${data.newRole}'s new role has been updated.`);
-            }
+              console.table(`Selected employee's role has been updated.`);
+              generateQuestions();
+            })
             });
     }
   });
