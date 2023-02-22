@@ -130,6 +130,51 @@ const employeeQuestions =
     }
   }]
 
+  const deleteDep =
+    {
+      type: "list",
+      name: "delDep",
+      message: "Which department would you like to delete?",
+      choices: function() {
+        return new Promise(function(resolve, reject) {
+          db.query(`SELECT department_name FROM departments`, function(err, results) {
+            if (err) reject(err);
+            resolve(results.map(result => ({name: result.department_name})));
+          })
+        })
+      }
+    }
+
+    const deleteRole =
+    {
+      type: "list",
+      name: "delRole",
+      message: "Which role would you like to delete?",
+      choices: function() {
+        return new Promise(function(resolve, reject) {
+          db.query(`SELECT job_title FROM roles`, function(err, results) {
+            if (err) reject(err);
+            resolve(results.map(result => ({name: result.job_title})));
+          })
+        })
+      }
+    }
+
+    const deleteEmp =
+    {
+      type: "list",
+      name: "delEmp",
+      message: "Which employee would you like to delete?",
+      choices: function() {
+        return new Promise(function(resolve, reject) {
+          db.query(`SELECT first_name, last_name, employee_id FROM employees`, function(err, results) {
+            if (err) reject(err);
+            resolve(results.map(result => ({name: `${result.first_name} ${result.last_name}`, value: result.employee_id})));
+          })
+        })
+      }
+    }
+
 function generateQuestions () {
   inquirerMod.prompt(mainQuestion, departmentQuestion)
   .then(function (data) {
@@ -209,7 +254,7 @@ function generateQuestions () {
           [data.firstName, data.lastName, data.role, data.repManager],
           function (err, results) {
             console.log("\n");
-            console.table(`${data.firstName} ${data.lastName} ${data.role} ${data.repManager} has been added to the employees table.`);
+            console.table(`${data.firstName} ${data.lastName} has been added to the employees table.`);
             generateQuestions();
           })
           });
@@ -217,7 +262,6 @@ function generateQuestions () {
           case "Update an employee role":
             inquirerMod.prompt(updateEmployee)
             .then(function (data) {
-              console.log(data.newManager);
             db.query(`UPDATE employees SET id_role = ?, manager_id = ? WHERE employee_id = ?`,
             [data.roleType, data.newManager, data.newRole],
             function (err, results) {
@@ -226,6 +270,43 @@ function generateQuestions () {
               generateQuestions();
             })
             });
+            break;
+            case "Delete a department":
+              inquirerMod.prompt(deleteDep)
+              .then(function (data) {
+              db.query(`DELETE FROM departments WHERE department_name = ?`,
+              (data.delDep),
+              function (err, results) {
+                console.log("\n");
+                console.table(`${data.delDep} has been deleted from database.`);
+                generateQuestions();
+              });
+              });
+              break;
+              case "Delete a role":
+                inquirerMod.prompt(deleteRole)
+                .then(function (data) {
+                db.query(`DELETE FROM roles WHERE job_title = ?`,
+                (data.delRole),
+                function (err, results) {
+                  console.log("\n");
+                  console.table(`${data.delRole} has been deleted from database.`);
+                  generateQuestions();
+                });
+                });
+                break;
+                case "Delete an employee":
+                  inquirerMod.prompt(deleteEmp)
+                  .then(function (data) {
+                  db.query(`DELETE FROM employees WHERE employee_id = ?`,
+                  [data.delEmp],
+                  function (err, results) {
+                    console.log("\n");
+                    console.table(`Selected employee has been deleted from database.`);
+                    generateQuestions();
+                  });
+                  });
+                  break;
     }
   });
 }
