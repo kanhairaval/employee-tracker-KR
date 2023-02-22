@@ -68,9 +68,9 @@ const employeeQuestions =
     message: "What is the role of the employee?",
     choices: function() {
       return new Promise(function(resolve, reject) {
-        db.query(`SELECT job_title, dep_id FROM roles`, function(err, results) {
+        db.query(`SELECT role_id, job_title FROM roles`, function(err, results) {
           if (err) reject(err);
-          resolve(results.map(result => ({name: result.job_title, value: result.dep_id})));
+          resolve(results.map(result => ({name: result.job_title, value: result.role_id})));
         });
       });
     }
@@ -83,11 +83,39 @@ const employeeQuestions =
       return new Promise(function(resolve, reject) {
         db.query(`SELECT manager_id, employee_id, first_name, last_name FROM employees`, function(err, results) {
           if (err) reject(err);
-          resolve(results.map(result => ({name: result.manager_id ? `${result.first_name} ${result.last_name}` : "None", value: result.manager_id})));
+          resolve(results.map(result => ({name: result.manager_id ? `${result.first_name} ${result.last_name}` : "None", value: result.employee_id})));
         });
       });
     }
   }]
+
+  const updateEmployee =
+  [{
+    type: "list",
+    name: "newRole",
+    message: "Which employee's role would you like to update?",
+    choices: function() {
+      return new Promise(function(resolve, reject) {
+        db.query(`SELECT first_name, last_name, employee_id FROM employees`, function(err, results) {
+          if(err) reject(err);
+          resolve(results.map(result => ({name: `${result.first_name} ${result.last_name}`, value: result.employee_id})))
+        });
+      });
+    }
+  },
+   {
+    type: "list",
+    name: "roleType",
+    message: "Which role do you want to assign to the selected employee?",
+    choices: function() {
+      return new Promise(function(resolve, reject) {
+        db.query(`SELECT job_title, role_id FROM roles`, function(err, results) {
+          if(err) reject(err);
+          resolve(results.map(result => ({name: result.job_title, value: result.role_id})))
+        });
+      });
+    }
+   }]
 
 function generateQuestions () {
   inquirerMod.prompt(mainQuestion, departmentQuestion)
@@ -163,10 +191,24 @@ function generateQuestions () {
           [data.firstName, data.lastName, data.role, data.repManager],
           function (err, results) {
             console.log("\n");
-            console.table(`${data.firstName} ${data.lastName} has been added to the employees table.`);
+            console.table(`${data.firstName} ${data.lastName} ${data.role} ${data.repManager} has been added to the employees table.`);
           })
           });
           break;
+          case "Update an employee role":
+            inquirerMod.prompt(updateEmployee)
+            .then(function (data) {
+              console.log(data.roleType)
+              console.log(data.newRole)
+            db.query(`UPDATE employees
+            SET id_role = ?
+            WHERE employee_id = ?`),
+            [data.roleType, data.newRole],
+            function (err, results) {
+              console.log("\n");
+              console.table(`${data.newRole}'s new role has been updated.`);
+            }
+            });
     }
   });
 }
