@@ -43,5 +43,4 @@
 
   ## Screenshot
 
-(https://user-images.githubusercontent.com/114125334/220816428-87d59cea-a69a-4422-80c5-baa98ebfde2d.png)
-
+![Screen Shot 2023-02-22 at 10 41 03 PM](https://user-images.githubusercontent.com/114125334/220816581-b08fc55b-ab5f-4909-815b-5d2943b0978a.png)
